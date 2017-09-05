@@ -6,6 +6,7 @@ package com.faceunity.fulivedemo.gles;
 
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
+import android.opengl.Matrix;
 
 import java.nio.FloatBuffer;
 
@@ -44,7 +45,7 @@ public class FaceClipFrameRect {
      * The texture coordinates are Y-inverted relative to RECTANGLE.  (This seems to work out
      * right with external textures from SurfaceTexture.)
      */
-    private static final float FULL_RECTANGLE_VERTEXT[] = {
+    private static  float mVertexCoords[] = {
             -1.0f, -1.0f,   // 0 bottom left
             1.0f, -1.0f,   // 1 bottom right
             -1.0f, 1.0f,   // 2 top left
@@ -54,15 +55,15 @@ public class FaceClipFrameRect {
     static float clipTop = 0.1f;
     static float clipBottom = 0.9f;
 
-    private static final float FULL_RECTANGLE_TEX_COORDS[] = {
+    private static  float mTextureCoords[] = {
             0.0f, clipTop,     // 0 bottom left
             1.0f, clipTop,     // 1 bottom right
             0.0f, clipBottom,     // 2 top left
             1.0f, clipBottom      // 3 top right
     };
-    private final FloatBuffer FULL_RECTANGLE_VERTEXT_BUF;
-    private final FloatBuffer FULL_RECTANGLE_TEX_BUF;
-
+    private final FloatBuffer mVertextBuf;
+    private final FloatBuffer mTextureBuf;
+    private float[] mMVPMatrix = new float[16];
     //private final Drawable2d mRectDrawable = new Drawable2d(Drawable2d.Prefab.FULL_RECTANGLE);
     //private Texture2dProgram mProgram;
 
@@ -73,8 +74,8 @@ public class FaceClipFrameRect {
     private int maPositionLoc;
     private int maTextureCoordLoc;
 
-    private FloatBuffer mVertexArray;
-    private FloatBuffer mTexCoordArray;
+    //private FloatBuffer mVertexArray;
+    //private FloatBuffer mTexCoordArray;
     private int mVertexCount;
     private int mCoordsPerVertex;
     private int mVertexStride;
@@ -117,14 +118,16 @@ public class FaceClipFrameRect {
          };
          */
 
-        FULL_RECTANGLE_VERTEXT_BUF = GlUtil.createFloatBuffer(FULL_RECTANGLE_VERTEXT);
-        FULL_RECTANGLE_TEX_BUF = GlUtil.createFloatBuffer(FULL_RECTANGLE_TEX_COORDS);
+        mVertextBuf = GlUtil.createFloatBuffer(mVertexCoords);
+        mTextureBuf = GlUtil.createFloatBuffer(mTextureCoords);
 
-        mVertexArray = FULL_RECTANGLE_VERTEXT_BUF;
-        mTexCoordArray = FULL_RECTANGLE_TEX_BUF;
+
         mCoordsPerVertex = 2;
         mVertexStride = mCoordsPerVertex * SIZEOF_FLOAT;
-        mVertexCount = FULL_RECTANGLE_VERTEXT.length / mCoordsPerVertex;
+        mVertexCount = mVertexCoords.length / mCoordsPerVertex;
+
+        Matrix.setIdentityM(mMVPMatrix,0);
+        //Matrix.translateM(mMVPMatrix,0,0.3f,0.3f,0);
     }
 
     /**
@@ -134,70 +137,70 @@ public class FaceClipFrameRect {
      */
     public void initVertexRadio(float xRadio, float yRadio) {
         //right, full screen x
-        FULL_RECTANGLE_VERTEXT[2] = FULL_RECTANGLE_VERTEXT[6] = -1.0f + 2 * xRadio;
+        mVertexCoords[2] = mVertexCoords[6] = -1.0f + 2 * xRadio;
         //bottom full screen y
-        FULL_RECTANGLE_VERTEXT[1] = FULL_RECTANGLE_VERTEXT[3] = 1.0f - 2 * yRadio;
+        mVertexCoords[1] = mVertexCoords[3] = 1.0f - 2 * yRadio;
         //FULL_RECTANGLE_VERTEXT_BUF.clear();
-        FULL_RECTANGLE_VERTEXT_BUF.put(FULL_RECTANGLE_VERTEXT);
-        FULL_RECTANGLE_VERTEXT_BUF.position(0);
+        mVertextBuf.put(mVertexCoords);
+        mVertextBuf.position(0);
     }
 
-    public void refreshTextureCoords(float[] coords1){
-//         float clipTop = 0.1f;
-//         float clipBottom = 0.9f;
-//
-//           float textureCoords[] = {
-//                0.5f, 0.1f,     // 0 bottom left
-//                1.0f, 0.1f,     // 1 bottom right
-//                0.5f, 0.6f,     // 2 top left
-//                1.0f, 0.6f      // 3 top right
-//        };
-
-//        float textureCoords[] = {
-//                     // 0 bottom left
-//                0.176f, 0.341f,     // 1 bottom right
-//                0.649f, 0.341f,     // 2 top left
-//                0.176f, 0.636f,
-//                0.649f, 0.636f      // 3 top right
-//        };
-
-        float textureCoordszTemp[] = new float[coords1.length];
-        float textureCoords[] = new float[coords1.length];
-        for (int i = 0;i < textureCoordszTemp.length;i+=2){
-            textureCoordszTemp[i] = (coords1[i] + 1f)/2f;
-            textureCoordszTemp[i + 1] = (coords1[i + 1] + 1)/2f;
-        }
-
-        textureCoords[0]  = textureCoordszTemp[2];
-        textureCoords[1]  = textureCoordszTemp[3];
-
-        textureCoords[2]  = textureCoordszTemp[4];
-        textureCoords[3]  = textureCoordszTemp[5];
-
-        textureCoords[4]  = textureCoordszTemp[0];
-        textureCoords[5]  = textureCoordszTemp[1];
-
-        textureCoords[6]  = textureCoordszTemp[6];
-        textureCoords[7]  = textureCoordszTemp[7];
-
-
-        for (int i = 0;i <FULL_RECTANGLE_TEX_COORDS.length;i++){
-            FULL_RECTANGLE_TEX_COORDS[i] = textureCoords[i];
-        }
-        FULL_RECTANGLE_TEX_BUF.put(FULL_RECTANGLE_TEX_COORDS);
-        FULL_RECTANGLE_TEX_BUF.position(0);
+    public void refreshTextureCoords(float[] textureCoords){
+        mTextureCoords = textureCoords;
+        mTextureBuf.put(mTextureCoords);
+        mTextureBuf.position(0);
     }
 
     public void refreshVertex(float[] vertex){
-        for (int i = 0; i < FULL_RECTANGLE_VERTEXT.length; i++){
-            FULL_RECTANGLE_VERTEXT[i] = vertex[i];
-        }
-        FULL_RECTANGLE_VERTEXT_BUF.put(FULL_RECTANGLE_VERTEXT);
-        FULL_RECTANGLE_VERTEXT_BUF.position(0);
+        mVertexCoords = vertex;
+        mVertextBuf.put(mVertexCoords);
+        mVertextBuf.position(0);
     }
 
-    public void refreshClipTextures(float[] datas){
-        refreshTextureCoords(datas);
+    //中间产物
+    private float[] tempCoords1 = new float[8];
+    private float[] tempCoords2 = new float[8];
+    public void refreshClipTextures(float[] data){
+        if (tempCoords1.length != data.length)
+            tempCoords1 = new float[data.length];
+        if (tempCoords2.length != data.length)
+            tempCoords2 = new float[data.length];
+
+        for (int i = 0;i < tempCoords2.length;i+=2){
+            tempCoords2[i] = (data[i] + 1f)/2f;
+            tempCoords2[i + 1] = (data[i + 1] + 1)/2f;
+        }
+
+        tempCoords1[0]  = tempCoords2[2];
+        tempCoords1[1]  = tempCoords2[3];
+
+        tempCoords1[2]  = tempCoords2[4];
+        tempCoords1[3]  = tempCoords2[5];
+
+        tempCoords1[4]  = tempCoords2[0];
+        tempCoords1[5]  = tempCoords2[1];
+
+        tempCoords1[6]  = tempCoords2[6];
+        tempCoords1[7]  = tempCoords2[7];
+        refreshTextureCoords(tempCoords1);
+
+        tempCoords2[0]  = data[2];
+        tempCoords2[1]  = data[3];
+
+        tempCoords2[2]  = data[4];
+        tempCoords2[3]  = data[5];
+
+        tempCoords2[4]  = data[0];
+        tempCoords2[5]  = data[1];
+
+        tempCoords2[6]  = data[6];
+        tempCoords2[7]  = data[7];
+
+        tempCoords1[0]  = tempCoords1[0] -1;
+        tempCoords1[2]  = tempCoords1[2] -1;
+        tempCoords1[4]  = tempCoords1[4] -1;
+        tempCoords1[6]  = tempCoords1[6] -1;
+        refreshVertex(tempCoords1);
     }
 
     /**
@@ -221,6 +224,7 @@ public class FaceClipFrameRect {
      * Draws a viewport-filling rect, texturing it with the specified texture object.
      */
     public void drawFrame(int textureId, float[] texMatrix) {
+        //Matrix.setIdentityM(texMatrix,0);
         // Use the identity matrix for MVP so our 2x2 FULL_RECTANGLE covers the viewport.
         GlUtil.checkGlError("draw start");
 
@@ -233,7 +237,7 @@ public class FaceClipFrameRect {
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, textureId);
 
         // Copy the model / view / projection matrix over.
-        GLES20.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, GlUtil.IDENTITY_MATRIX, 0);
+        GLES20.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mMVPMatrix, 0);
         GlUtil.checkGlError("glUniformMatrix4fv");
 
         // Copy the texture transformation matrix over.
@@ -246,7 +250,7 @@ public class FaceClipFrameRect {
 
         // Connect vertexBuffer to "aPosition".
         GLES20.glVertexAttribPointer(maPositionLoc, mCoordsPerVertex,
-                GLES20.GL_FLOAT, false, mVertexStride, mVertexArray);
+                GLES20.GL_FLOAT, false, mVertexStride, mVertextBuf);
         GlUtil.checkGlError("glVertexAttribPointer");
 
         // Enable the "aTextureCoord" vertex attribute.
@@ -255,7 +259,7 @@ public class FaceClipFrameRect {
 
         // Connect texBuffer to "aTextureCoord".
         GLES20.glVertexAttribPointer(maTextureCoordLoc, 2,
-                GLES20.GL_FLOAT, false, mTexCoordStride, mTexCoordArray);
+                GLES20.GL_FLOAT, false, mTexCoordStride, mTextureBuf);
         GlUtil.checkGlError("glVertexAttribPointer");
 
         // Draw the rect.
