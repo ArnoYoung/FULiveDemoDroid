@@ -55,6 +55,8 @@ public class MainActivity extends ListActivity {
             {"fuRenderToNV21Image",
                     "示例：单输入，输入摄像头nv21格式内容，输出添加美颜和道具后的nv21 bytes和texture",
                     "FURenderToNV21ImageExampleActivity"},
+            {"Test", "dev","TestActivity"
+            },
     };
 
     @Override
@@ -74,6 +76,15 @@ public class MainActivity extends ListActivity {
                 new String[]{TITLE, DESCRIPTION},
                 new int[]{android.R.id.text1, android.R.id.text2}
         ));
+
+//        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+//            @Override
+//            public void uncaughtException(Thread t, Throwable e) {
+//                e.printStackTrace();
+//                e.printStackTrace();
+//
+//            }
+//        });
     }
 
     /**

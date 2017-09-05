@@ -35,6 +35,11 @@
             android:name="com.faceunity.fulivedemo.FURenderToNV21ImageExampleActivity"
             android:screenOrientation="portrait"
             android:theme="@style/FullScreenTheme" />
+
+        <activity
+            android:name="com.faceunity.fulivedemo.TestActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/FullScreenTheme" />
     </application>
 
 </manifest>

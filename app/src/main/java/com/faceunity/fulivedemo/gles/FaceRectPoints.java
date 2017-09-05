@@ -15,19 +15,18 @@
  */
 package com.faceunity.fulivedemo.gles;
 
+import android.opengl.GLES20;
+import android.util.Log;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
 
-import android.opengl.GLES20;
-import android.opengl.Matrix;
-import android.util.Log;
-
 /**
  *
  */
-public class LandmarksPoints {
+public class FaceRectPoints {
 
     private final String vertexShaderCode =
             // This matrix member variable provides a hook to manipulate
@@ -57,16 +56,16 @@ public class LandmarksPoints {
     private int mMVPMatrixHandle;
     private int mPointSizeHandle;
 
-    private float mPointSize = 6.0f;
+    private float mPointSize = 18.0f;
 
     // number of coordinates per vertex in this array
     static final int COORDS_PER_VERTEX = 2;
 
-    public float pointsCoords[] = new float[150];
+    public float pointsCoords[] = new float[8];
     private final int vertexCount = pointsCoords.length / COORDS_PER_VERTEX;
     private final int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
 
-    float color[] = { 0.63671875f, 0.76953125f, 0.22265625f, 1.0f };
+    float color[] = { 0.63671875f, 0.0f, 0.0f, 1.0f };
 
     static float[] originMtx;
     static float[] flipMtx;
@@ -80,7 +79,7 @@ public class LandmarksPoints {
     /**
      * Sets up the drawing object data for use in an OpenGL ES context.
      */
-    public LandmarksPoints() {
+    public FaceRectPoints() {
         // initialize vertex byte buffer for shape coordinates
         bb = ByteBuffer.allocateDirect(
                 // (number of coordinate values * 4 bytes per float)
@@ -111,7 +110,6 @@ public class LandmarksPoints {
         mPointSize = pointSize;
     }
 
-    int i = 0;
     /**
      * Encapsulates the OpenGL ES instructions for drawing this shape.
      */
@@ -156,17 +154,19 @@ public class LandmarksPoints {
 
         // Disable vertex array
         GLES20.glDisableVertexAttribArray(mPositionHandle);
-
-        //打印点位
     }
 
-    public void refresh(float[] landmarksData, int fullWidthY, int fullHeightX, float topClipRatio, float heightClipRatio, boolean isFlip) {
-        for (int i = 0; i < 150; i++) pointsCoords[i] = landmarksData[i];
+
+    public void refresh(float[] faceData, int fullWidth, int fullHeight, float topClipRatio, float heightClipRatio, boolean isFlip) {
+
+        float[] landmarksData = genFacePoints(faceData,fullWidth,fullHeight);
+
+        for (int i = 0; i < pointsCoords.length; i++) pointsCoords[i] = landmarksData[i];
         //adjust to get the coords
         for (int i = 0; i < landmarksData.length; i += 2) {
             float x, y;
-            x = (isFlip ? (fullWidthY - pointsCoords[i]) : pointsCoords[i]) / fullWidthY;
-            y = (pointsCoords[i + 1]) / fullHeightX;
+            x = (isFlip ? (fullWidth - pointsCoords[i]) : pointsCoords[i]) / fullWidth;
+            y = (pointsCoords[i + 1]) / fullHeight;
 
             //adjust corresponds to clip to camera preview and show only top left (0.4, 0.4 * 0.8)
             x = (x - topClipRatio) / heightClipRatio;
@@ -181,6 +181,7 @@ public class LandmarksPoints {
         // set the buffer to read the first coordinate
         vertexBuffer.position(0);
 
+        //打印点位置
         i ++;
         if (i > 20){
             StringBuilder builder = new StringBuilder();
@@ -193,11 +194,25 @@ public class LandmarksPoints {
             for (float f:landmarksData){
                 builder.append(f + " ;");
             }
-            Log.d("@facemarked",builder.toString());
+            Log.d("@facerect",builder.toString());
         }
+
     }
 
-    public void refreshFulll(float[] landmarksData, int fullWidth, int fullHeight, float topClipRatio, float heightClipRatio, boolean isFlip) {
+    int i = 0;
+
+    /**
+     * landmarksData 变量以右下角为原点计算
+     * @param faceData
+     * @param fullWidth
+     * @param fullHeight
+     * @param topClipRatio
+     * @param heightClipRatio
+     * @param isFlip
+     */
+    public float[] refreshFulll(float[] faceData, int fullWidth, int fullHeight, float topClipRatio, float heightClipRatio, boolean isFlip) {
+
+        float[] landmarksData = genFacePoints(faceData,fullWidth,fullHeight);
 
         for (int i = 0; i < pointsCoords.length; i++) pointsCoords[i] = landmarksData[i];
         //adjust to get the coords
@@ -234,7 +249,42 @@ public class LandmarksPoints {
             }
             Log.d("@facerect",builder.toString());
         }
+        return pointsCoords;
 
+    }
+
+
+    public float[] genFacePoints(float[] datas,float fullWidth,float fullHeight){
+        float[] rt = new float[8];
+        float xMin = datas[0];
+        float yMax = datas[3];
+        float xMax = datas[2];
+        float yMin = datas[1];
+
+        rt[0] = xMin;
+        rt[1] = yMin;
+
+        rt[2] = xMax;
+        rt[3] = yMin;
+
+        rt[4] = xMax;
+        rt[5] = yMax;
+
+        rt[6] = xMin;
+        rt[7] = yMax;
+
+        for (int j= 0;j<rt.length;j++){
+            if (j%2 == 0){
+                rt[j] = fullWidth - rt[j];
+            }else {
+                rt[j] = fullHeight - rt[j];
+            }
+        }
+        return rt;
+    }
+
+    public void refresh(float[] landmarksData, int fullWidth, int fullHeight){
+        landmarksData[0] = -0.5f;
     }
 
     /**
