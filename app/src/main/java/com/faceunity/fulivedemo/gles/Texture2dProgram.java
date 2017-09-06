@@ -20,6 +20,8 @@ import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.util.Log;
 
+import com.faceunity.fulivedemo.gles.utils.GlUtil;
+
 import java.nio.FloatBuffer;
 
 /**

@@ -77,6 +77,8 @@ public class MainActivity extends ListActivity {
                 new int[]{android.R.id.text1, android.R.id.text2}
         ));
 
+        Consts.appContext = this.getApplicationContext();
+
 //        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 //            @Override
 //            public void uncaughtException(Thread t, Throwable e) {

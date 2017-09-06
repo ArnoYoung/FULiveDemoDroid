@@ -16,6 +16,8 @@
 
 package com.faceunity.fulivedemo.gles;
 
+import com.faceunity.fulivedemo.gles.utils.GlUtil;
+
 import java.nio.FloatBuffer;
 
 /**

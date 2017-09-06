@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.faceunity.fulivedemo.gles;
+package com.faceunity.fulivedemo.gles.utils;
 
 import android.opengl.GLES20;
 import android.opengl.GLES30;

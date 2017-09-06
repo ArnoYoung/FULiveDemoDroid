@@ -16,6 +16,8 @@
 
 package com.faceunity.fulivedemo.gles;
 
+import com.faceunity.fulivedemo.gles.utils.GlUtil;
+
 /**
  * This class essentially represents a viewport-sized sprite that will be rendered with
  * a texture, usually from an external source like the camera or video decoder.

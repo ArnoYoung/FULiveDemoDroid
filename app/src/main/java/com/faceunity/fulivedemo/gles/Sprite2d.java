@@ -18,6 +18,8 @@ package com.faceunity.fulivedemo.gles;
 
 import android.opengl.Matrix;
 
+import com.faceunity.fulivedemo.gles.utils.GlUtil;
+
 /**
  * Base class for a 2d object.  Includes position, scale, rotation, and flat-shaded color.
  */

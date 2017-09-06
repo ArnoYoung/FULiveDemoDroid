@@ -26,6 +26,8 @@ import android.opengl.EGLSurface;
 import android.util.Log;
 import android.view.Surface;
 
+import com.faceunity.fulivedemo.gles.utils.GlUtil;
+
 /**
  * Core EGL state (display, context, config).
  * <p>

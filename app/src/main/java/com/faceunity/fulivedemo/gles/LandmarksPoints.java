@@ -21,8 +21,9 @@ import java.nio.FloatBuffer;
 import java.util.Arrays;
 
 import android.opengl.GLES20;
-import android.opengl.Matrix;
 import android.util.Log;
+
+import com.faceunity.fulivedemo.gles.utils.GlUtil;
 
 /**
  *
