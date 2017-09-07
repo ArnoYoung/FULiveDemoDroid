@@ -15,9 +15,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.faceunity.fulivedemo.gles.CameraClipFrameRect;
-import com.faceunity.fulivedemo.gles.FullFrameRect;
-import com.faceunity.fulivedemo.gles.LandmarksPoints;
+import com.faceunity.fulivedemo.gles.drawer.CameraClipFrameRect;
+import com.faceunity.fulivedemo.gles.drawer.FullFrameRect;
+import com.faceunity.fulivedemo.gles.drawer.FaceMarksPointsDrawer;
 import com.faceunity.fulivedemo.gles.Texture2dProgram;
 import com.faceunity.fulivedemo.encoder.TextureMovieEncoder;
 import com.faceunity.wrapper.faceunity;
@@ -273,7 +273,7 @@ public class FUDualInputToTextureExampleActivity extends FUBaseUIActivity
 
         CameraClipFrameRect cameraClipFrameRect;
 
-        LandmarksPoints landmarksPoints;
+        FaceMarksPointsDrawer landmarksPoints;
         float[] landmarksData = new float[150];
 
         @Override
@@ -287,7 +287,7 @@ public class FUDualInputToTextureExampleActivity extends FUBaseUIActivity
             mCameraTextureId = mFullScreenCamera.createTextureObject();
 
             cameraClipFrameRect = new CameraClipFrameRect(0.4f, 0.4f * 0.8f); //clip 20% vertical
-            landmarksPoints = new LandmarksPoints();//如果有证书权限可以获取到的话，绘制人脸特征点
+            landmarksPoints = new FaceMarksPointsDrawer();//如果有证书权限可以获取到的话，绘制人脸特征点
 
             switchCameraSurfaceTexture();
 

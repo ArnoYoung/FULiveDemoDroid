@@ -1,4 +1,4 @@
-package com.faceunity.fulivedemo.gles;
+package com.faceunity.fulivedemo.gles.drawer;
 
 /**
  * Created by lirui on 2017/4/10.

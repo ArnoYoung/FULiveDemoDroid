@@ -16,11 +16,11 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.faceunity.fulivedemo.encoder.TextureMovieEncoder;
-import com.faceunity.fulivedemo.gles.CameraClipFrameRect;
-import com.faceunity.fulivedemo.gles.FaceClipFrameRect;
-import com.faceunity.fulivedemo.gles.FaceRectPoints;
-import com.faceunity.fulivedemo.gles.FullFrameRect;
-import com.faceunity.fulivedemo.gles.LandmarksPoints;
+import com.faceunity.fulivedemo.gles.drawer.CameraClipFrameRect;
+import com.faceunity.fulivedemo.gles.drawer.FaceClipFrameRect;
+import com.faceunity.fulivedemo.gles.drawer.FaceRectPoints;
+import com.faceunity.fulivedemo.gles.drawer.FullFrameRect;
+import com.faceunity.fulivedemo.gles.drawer.FaceMarksPointsDrawer;
 import com.faceunity.fulivedemo.gles.Texture2dProgram;
 import com.faceunity.wrapper.faceunity;
 
@@ -276,7 +276,7 @@ public class TestActivity1 extends FUBaseUIActivity
         CameraClipFrameRect cameraClipFrameRect;
         FaceClipFrameRect faceClipFrameRect;
 
-        LandmarksPoints landmarksPoints;
+        FaceMarksPointsDrawer landmarksPoints;
         FaceRectPoints faceRectPoints;
         float[] landmarksData = new float[75 * 2];
         float[] faceRectData = new float[4];
@@ -294,7 +294,7 @@ public class TestActivity1 extends FUBaseUIActivity
             cameraClipFrameRect = new CameraClipFrameRect(0.4f, 0.4f * 0.8f); //clip 20% vertical
             faceClipFrameRect = new FaceClipFrameRect();
             faceClipFrameRect.initVertexRadio(0.4f,0.4f*0.8f);
-            landmarksPoints = new LandmarksPoints();//如果有证书权限可以获取到的话，绘制人脸特征点
+            landmarksPoints = new FaceMarksPointsDrawer();//如果有证书权限可以获取到的话，绘制人脸特征点
             faceRectPoints = new FaceRectPoints();//如果有证书权限可以获取到的话，绘制人脸特征点
 
 
@@ -503,7 +503,7 @@ public class TestActivity1 extends FUBaseUIActivity
                 faceunity.fuGetFaceInfo(0,"face_rect",faceRectData);
                 clipTextures = faceRectPoints.refreshFulll(faceRectData, cameraWidth, cameraHeight, 0.1f, 0.8f, currentCameraType != Camera.CameraInfo.CAMERA_FACING_FRONT);
                 faceRectPoints.draw();
-                landmarksPoints.refreshFulll(landmarksData, cameraWidth, cameraHeight, 0.1f, 0.8f, currentCameraType != Camera.CameraInfo.CAMERA_FACING_FRONT);
+                landmarksPoints.refreshFulll(landmarksData, cameraWidth, cameraHeight, currentCameraType != Camera.CameraInfo.CAMERA_FACING_FRONT);
                 landmarksPoints.draw();
 
                 faceClipFrameRect.refreshClipTextures(clipTextures);

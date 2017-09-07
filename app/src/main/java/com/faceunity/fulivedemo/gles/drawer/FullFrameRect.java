@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package com.faceunity.fulivedemo.gles;
+package com.faceunity.fulivedemo.gles.drawer;
 
+import com.faceunity.fulivedemo.gles.Drawable2d;
+import com.faceunity.fulivedemo.gles.Texture2dProgram;
 import com.faceunity.fulivedemo.gles.utils.GlUtil;
 
 /**

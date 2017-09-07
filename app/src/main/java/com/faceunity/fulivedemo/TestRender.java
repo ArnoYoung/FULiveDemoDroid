@@ -21,11 +21,11 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 
-import com.faceunity.fulivedemo.gles.CameraClipFrameRect;
-import com.faceunity.fulivedemo.gles.FaceClipFrameRect;
-import com.faceunity.fulivedemo.gles.FaceRectPoints;
-import com.faceunity.fulivedemo.gles.FullFrameRect;
-import com.faceunity.fulivedemo.gles.LandmarksPoints;
+import com.faceunity.fulivedemo.gles.drawer.CameraClipFrameRect;
+import com.faceunity.fulivedemo.gles.drawer.FaceClipFrameRect;
+import com.faceunity.fulivedemo.gles.drawer.FaceRectPointsDrawer;
+import com.faceunity.fulivedemo.gles.drawer.FullFrameRect;
+import com.faceunity.fulivedemo.gles.drawer.FaceMarksPointsDrawer;
 import com.faceunity.fulivedemo.gles.Texture2dProgram;
 import com.faceunity.wrapper.faceunity;
 
@@ -90,9 +90,9 @@ public class TestRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFram
     //绘制捕捉到的脸小窗口
     private FaceClipFrameRect faceClipFrameRect;
     //在左上角绘制脸部标记点 对应CameraClipFrameRect窗口
-    private LandmarksPoints landmarksPoints;
+    private FaceMarksPointsDrawer landmarksPoints;
     //在整体窗口绘制脸部标记点
-    private FaceRectPoints faceRectPoints;
+    private FaceRectPointsDrawer faceRectPoints;
 
     //特质标记点
     private float[] landmarksData = new float[75 * 2];
@@ -173,8 +173,8 @@ public class TestRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFram
         cameraClipFrameRect = new CameraClipFrameRect(0.4f, 0.4f * 0.8f); //clip 20% vertical
         faceClipFrameRect = new FaceClipFrameRect();
         faceClipFrameRect.initVertexRadio(0.4f, 0.4f * 0.8f);
-        landmarksPoints = new LandmarksPoints();//如果有证书权限可以获取到的话，绘制人脸特征点
-        faceRectPoints = new FaceRectPoints();//如果有证书权限可以获取到的话，绘制人脸特征点
+        landmarksPoints = new FaceMarksPointsDrawer();//如果有证书权限可以获取到的话，绘制人脸特征点
+        faceRectPoints = new FaceRectPointsDrawer();//如果有证书权限可以获取到的话，绘制人脸特征点
 
 
         switchCameraSurfaceTexture();
@@ -385,12 +385,19 @@ public class TestRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFram
             //cameraClipFrameRect.drawFrame(mCameraTextureId, mtx);
             faceunity.fuGetFaceInfo(0, "landmarks", landmarksData);
             faceunity.fuGetFaceInfo(0, "face_rect", faceRectData);
-            clipTextures = faceRectPoints.refreshFulll(faceRectData, cameraWidth, cameraHeight, 0.1f, 0.8f, cameraFacingDirection != Camera.CameraInfo.CAMERA_FACING_FRONT);
+            faceRectPoints.refreshFulll(faceRectData, cameraWidth, cameraHeight,cameraFacingDirection != Camera.CameraInfo.CAMERA_FACING_FRONT);
             faceRectPoints.draw();
-            landmarksPoints.refreshFulll(landmarksData, cameraWidth, cameraHeight, 0.1f, 0.8f, cameraFacingDirection != Camera.CameraInfo.CAMERA_FACING_FRONT);
+            landmarksPoints.refreshFulll(landmarksData, cameraWidth, cameraHeight, cameraFacingDirection != Camera.CameraInfo.CAMERA_FACING_FRONT);
             landmarksPoints.draw();
 
-            faceClipFrameRect.refreshClipTextures(clipTextures);
+//            float[] adds = new float[clipTextures.length + 2];
+//            for (int i = 0;i < clipTextures.length;i++){
+//                adds[i] = clipTextures[i];
+//            }
+//            adds[adds.length - 2] = makrs[64*2 - 2];
+//            adds[adds.length - 1] = makrs[64*2 - 1];
+
+            faceClipFrameRect.refreshClipTextures2(landmarksPoints.getFaceOutline());
             faceClipFrameRect.drawFrame(mCameraTextureId, mtx);
 
 //                faceRectPoints.refresh(faceRectData, cameraWidth, cameraHeight, 0.1f, 0.8f, currentCameraType != Camera.CameraInfo.CAMERA_FACING_FRONT);

@@ -24,6 +24,7 @@ import android.util.Log;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.nio.ShortBuffer;
 
 /**
  * Some OpenGL utility functions.
@@ -172,6 +173,16 @@ public class GlUtil {
         ByteBuffer bb = ByteBuffer.allocateDirect(coords.length * SIZEOF_FLOAT);
         bb.order(ByteOrder.nativeOrder());
         FloatBuffer fb = bb.asFloatBuffer();
+        fb.put(coords);
+        fb.position(0);
+        return fb;
+    }
+
+    public static ShortBuffer createShotBuffer(short[] coords) {
+        // Allocate a direct ByteBuffer, using 4 bytes per float, and copy coords into it.
+        ByteBuffer bb = ByteBuffer.allocateDirect(coords.length * 2);
+        bb.order(ByteOrder.nativeOrder());
+        ShortBuffer fb = bb.asShortBuffer();
         fb.put(coords);
         fb.position(0);
         return fb;

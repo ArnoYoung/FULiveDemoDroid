@@ -1,4 +1,4 @@
-package com.faceunity.fulivedemo.gles;
+package com.faceunity.fulivedemo.gles.drawer;
 
 /**
  * Created by lirui on 2017/4/10.
@@ -6,11 +6,13 @@ package com.faceunity.fulivedemo.gles;
 
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
+import android.opengl.GLU;
 import android.opengl.Matrix;
 
 import com.faceunity.fulivedemo.gles.utils.GlUtil;
 
 import java.nio.FloatBuffer;
+import java.nio.ShortBuffer;
 
 /**
  * This class essentially represents a viewport-sized sprite that will be rendered with
@@ -63,8 +65,12 @@ public class FaceClipFrameRect {
             0.0f, clipBottom,     // 2 top left
             1.0f, clipBottom      // 3 top right
     };
-    private final FloatBuffer mVertextBuf;
-    private final FloatBuffer mTextureBuf;
+
+    // 绘制顶点的顺序
+    private short mDrawOrder[] = {0, 2, 1, 0, 3, 2};
+    private  FloatBuffer mVertextBuf;
+    private  FloatBuffer mTextureBuf;
+    private  ShortBuffer mOrderBuf;
     private float[] mMVPMatrix = new float[16];
     //private final Drawable2d mRectDrawable = new Drawable2d(Drawable2d.Prefab.FULL_RECTANGLE);
     //private Texture2dProgram mProgram;
@@ -122,7 +128,7 @@ public class FaceClipFrameRect {
 
         mVertextBuf = GlUtil.createFloatBuffer(mVertexCoords);
         mTextureBuf = GlUtil.createFloatBuffer(mTextureCoords);
-
+        mOrderBuf = GlUtil.createShotBuffer(mDrawOrder);
 
         mCoordsPerVertex = 2;
         mVertexStride = mCoordsPerVertex * SIZEOF_FLOAT;
@@ -148,61 +154,174 @@ public class FaceClipFrameRect {
     }
 
     public void refreshTextureCoords(float[] textureCoords){
-        mTextureCoords = textureCoords;
-        mTextureBuf.put(mTextureCoords);
-        mTextureBuf.position(0);
+        if (mTextureCoords.length != textureCoords.length){
+            mTextureCoords = textureCoords;
+            mTextureBuf = GlUtil.createFloatBuffer(textureCoords);
+        }else {
+            mTextureCoords = textureCoords;
+            mTextureBuf.put(mTextureCoords);
+            mTextureBuf.position(0);
+        }
+
     }
 
     public void refreshVertex(float[] vertex){
-        mVertexCoords = vertex;
-        mVertextBuf.put(mVertexCoords);
-        mVertextBuf.position(0);
+        if (vertex.length != mVertexCoords.length){
+            mVertexCoords = vertex;
+            mVertextBuf = GlUtil.createFloatBuffer(vertex);
+        }else {
+            mVertexCoords = vertex;
+            mVertextBuf.put(mVertexCoords);
+            mVertextBuf.position(0);
+        }
+
     }
 
     //中间产物
     private float[] tempCoords1 = new float[8];
     private float[] tempCoords2 = new float[8];
+
+    /**
+     * @param data 抠图的顶点坐标
+     */
     public void refreshClipTextures(float[] data){
+        //中间数组
         if (tempCoords1.length != data.length)
             tempCoords1 = new float[data.length];
         if (tempCoords2.length != data.length)
             tempCoords2 = new float[data.length];
-
+        //转换为抠图的纹理坐标
         for (int i = 0;i < tempCoords2.length;i+=2){
             tempCoords2[i] = (data[i] + 1f)/2f;
             tempCoords2[i + 1] = (data[i + 1] + 1)/2f;
         }
 
-        tempCoords1[0]  = tempCoords2[2];
-        tempCoords1[1]  = tempCoords2[3];
+//        tempCoords1[0]  = tempCoords2[2];
+//        tempCoords1[1]  = tempCoords2[3];
+//
+//        tempCoords1[2]  = tempCoords2[4];
+//        tempCoords1[3]  = tempCoords2[5];
+//
+//        tempCoords1[4]  = tempCoords2[0];
+//        tempCoords1[5]  = tempCoords2[1];
+//
+//        tempCoords1[6]  = tempCoords2[6];
+//        tempCoords1[7]  = tempCoords2[7];
+        tempCoords1[0]  = tempCoords2[0];
+        tempCoords1[1]  = tempCoords2[1];
 
-        tempCoords1[2]  = tempCoords2[4];
-        tempCoords1[3]  = tempCoords2[5];
+        tempCoords1[2]  = tempCoords2[2];
+        tempCoords1[3]  = tempCoords2[3];
 
-        tempCoords1[4]  = tempCoords2[0];
-        tempCoords1[5]  = tempCoords2[1];
+        tempCoords1[4]  = tempCoords2[4];
+        tempCoords1[5]  = tempCoords2[5];
 
         tempCoords1[6]  = tempCoords2[6];
         tempCoords1[7]  = tempCoords2[7];
         refreshTextureCoords(tempCoords1);
-
-        tempCoords2[0]  = data[2];
-        tempCoords2[1]  = data[3];
-
-        tempCoords2[2]  = data[4];
-        tempCoords2[3]  = data[5];
-
-        tempCoords2[4]  = data[0];
-        tempCoords2[5]  = data[1];
-
-        tempCoords2[6]  = data[6];
-        tempCoords2[7]  = data[7];
+//
+//        tempCoords2[0]  = data[2];
+//        tempCoords2[1]  = data[3];
+//
+//        tempCoords2[2]  = data[4];
+//        tempCoords2[3]  = data[5];
+//
+//        tempCoords2[4]  = data[0];
+//        tempCoords2[5]  = data[1];
+//
+//        tempCoords2[6]  = data[6];
+//        tempCoords2[7]  = data[7];
 
         tempCoords1[0]  = tempCoords1[0] -1;
         tempCoords1[2]  = tempCoords1[2] -1;
         tempCoords1[4]  = tempCoords1[4] -1;
         tempCoords1[6]  = tempCoords1[6] -1;
         refreshVertex(tempCoords1);
+    }
+
+    /**
+     * @param data 抠图的顶点坐标
+     */
+    public void refreshClipTextures2(float[] data){
+        //中间数组
+        if (tempCoords1.length != data.length)
+            tempCoords1 = new float[data.length];
+        if (tempCoords2.length != data.length)
+            tempCoords2 = new float[data.length];
+        //转换为抠图的纹理坐标
+        for (int i = 0;i < tempCoords2.length;i+=2){
+            tempCoords2[i] = (data[i] + 1f)/2f;
+            tempCoords2[i + 1] = (data[i + 1] + 1)/2f;
+        }
+
+//        tempCoords1[0]  = tempCoords2[2];
+//        tempCoords1[1]  = tempCoords2[3];
+//
+//        tempCoords1[2]  = tempCoords2[4];
+//        tempCoords1[3]  = tempCoords2[5];
+//
+//        tempCoords1[4]  = tempCoords2[0];
+//        tempCoords1[5]  = tempCoords2[1];
+//
+//        tempCoords1[6]  = tempCoords2[6];
+//        tempCoords1[7]  = tempCoords2[7];
+
+//        tempCoords1[0]  = tempCoords2[0];
+//        tempCoords1[1]  = tempCoords2[1];
+//
+//        tempCoords1[2]  = tempCoords2[2];
+//        tempCoords1[3]  = tempCoords2[3];
+//
+//        tempCoords1[4]  = tempCoords2[4];
+//        tempCoords1[5]  = tempCoords2[5];
+//
+//        tempCoords1[6]  = tempCoords2[6];
+//        tempCoords1[7]  = tempCoords2[7];
+//
+//        float[] temps = new float[tempCoords2.length - 2];
+//        for (int i =  0;i<temps.length;i++){
+//            temps[i] = tempCoords2[i];
+//        }
+        refreshTextureCoords(tempCoords2);
+//
+//        tempCoords2[0]  = data[2];
+//        tempCoords2[1]  = data[3];
+//
+//        tempCoords2[2]  = data[4];
+//        tempCoords2[3]  = data[5];
+//
+//        tempCoords2[4]  = data[0];
+//        tempCoords2[5]  = data[1];
+//
+//        tempCoords2[6]  = data[6];
+//        tempCoords2[7]  = data[7];
+
+
+//        tempCoords1[0]  = tempCoords1[0] -1;
+//        tempCoords1[2]  = tempCoords1[2] -1;
+//        tempCoords1[4]  = tempCoords1[4] -1;
+//        tempCoords1[6]  = tempCoords1[6] -1;
+        refreshVertex(tempCoords2);
+
+        refreshOrder(tempCoords2);
+    }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public void refreshOrder(float[] coords){
+        int tgNum = coords.length/2 -1;
+        if (mDrawOrder.length != tgNum * 3 ){
+            short coreIndex = (short) (coords.length/2-1);
+            mDrawOrder = new short[tgNum * 3];
+
+            for (short i = 0; i< tgNum - 1;i ++){
+                mDrawOrder[i*3 + 2] = (short) (i + 1);
+                mDrawOrder[i*3 + 1] = i;
+                mDrawOrder[i*3] = coreIndex;
+            }
+            mDrawOrder[mDrawOrder.length - 3] = 0;
+            mDrawOrder[mDrawOrder.length - 2] = (short) (coreIndex - 1);
+            mDrawOrder[mDrawOrder.length - 3] = coreIndex;
+            mOrderBuf = GlUtil.createShotBuffer(mDrawOrder);
+        }
     }
 
     /**
@@ -268,6 +387,7 @@ public class FaceClipFrameRect {
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, mVertexCount);
         GlUtil.checkGlError("glDrawArrays");
 
+        GLES20.glDrawElements(GLES20.GL_TRIANGLES, mDrawOrder.length, GLES20.GL_UNSIGNED_SHORT, mOrderBuf);
         // Done -- disable vertex array, texture, and program.
         GLES20.glDisableVertexAttribArray(maPositionLoc);
         GLES20.glDisableVertexAttribArray(maTextureCoordLoc);

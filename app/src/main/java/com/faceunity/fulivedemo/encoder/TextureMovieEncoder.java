@@ -29,7 +29,7 @@ import android.os.Message;
 import android.util.Log;
 
 import com.faceunity.fulivedemo.gles.EglCore;
-import com.faceunity.fulivedemo.gles.FullFrameRect;
+import com.faceunity.fulivedemo.gles.drawer.FullFrameRect;
 import com.faceunity.fulivedemo.gles.Texture2dProgram;
 import com.faceunity.fulivedemo.gles.WindowSurface;
 
