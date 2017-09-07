@@ -22,7 +22,7 @@ import android.opengl.GLSurfaceView;
 import android.util.Log;
 
 import com.faceunity.fulivedemo.gles.drawer.CameraClipFrameRect;
-import com.faceunity.fulivedemo.gles.drawer.FaceClipFrameRect;
+import com.faceunity.fulivedemo.gles.drawer.FaceClipDrawer;
 import com.faceunity.fulivedemo.gles.drawer.FaceRectPointsDrawer;
 import com.faceunity.fulivedemo.gles.drawer.FullFrameRect;
 import com.faceunity.fulivedemo.gles.drawer.FaceMarksPointsDrawer;
@@ -88,7 +88,7 @@ public class TestRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFram
     //绘制整体的小窗口
     private CameraClipFrameRect cameraClipFrameRect;
     //绘制捕捉到的脸小窗口
-    private FaceClipFrameRect faceClipFrameRect;
+    private FaceClipDrawer mFaceClipDrawer;
     //在左上角绘制脸部标记点 对应CameraClipFrameRect窗口
     private FaceMarksPointsDrawer landmarksPoints;
     //在整体窗口绘制脸部标记点
@@ -171,8 +171,8 @@ public class TestRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFram
         mCameraTextureId = mFullScreenCamera.createTextureObject();
 
         cameraClipFrameRect = new CameraClipFrameRect(0.4f, 0.4f * 0.8f); //clip 20% vertical
-        faceClipFrameRect = new FaceClipFrameRect();
-        faceClipFrameRect.initVertexRadio(0.4f, 0.4f * 0.8f);
+        mFaceClipDrawer = new FaceClipDrawer(mCameraTextureId);
+
         landmarksPoints = new FaceMarksPointsDrawer();//如果有证书权限可以获取到的话，绘制人脸特征点
         faceRectPoints = new FaceRectPointsDrawer();//如果有证书权限可以获取到的话，绘制人脸特征点
 
@@ -397,8 +397,8 @@ public class TestRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFram
 //            adds[adds.length - 2] = makrs[64*2 - 2];
 //            adds[adds.length - 1] = makrs[64*2 - 1];
 
-            faceClipFrameRect.refreshClipTextures2(landmarksPoints.getFaceOutline());
-            faceClipFrameRect.drawFrame(mCameraTextureId, mtx);
+            mFaceClipDrawer.refreshClipTextures2(landmarksPoints.getFaceOutline());
+            mFaceClipDrawer.draw(mtx);
 
 //                faceRectPoints.refresh(faceRectData, cameraWidth, cameraHeight, 0.1f, 0.8f, currentCameraType != Camera.CameraInfo.CAMERA_FACING_FRONT);
 //                faceRectPoints.draw();

@@ -12,7 +12,7 @@ import java.util.Arrays;
  */
 
 public class PointDrawer implements IDrawer{
-    private final String vertexShaderCode =
+    private static final String vertexShaderCode =
             // This matrix member variable provides a hook to manipulate
             // the coordinates of the objects that use this vertex shader
             "uniform mat4 uMVPMatrix;" +
@@ -26,7 +26,7 @@ public class PointDrawer implements IDrawer{
                     "  gl_PointSize = uPointSize;" +
                     "}";
 
-    private final String fragmentShaderCode =
+    private static final String fragmentShaderCode =
             "precision mediump float;" +
                     "uniform vec4 vColor;" +
                     "void main() {" +
@@ -34,9 +34,10 @@ public class PointDrawer implements IDrawer{
                     "}";
 
     //number of coordinates per vertex in this array
-    protected final int COORDS_PER_VERTEX = 2;
-    protected final int BYTES_PER_FLOAT = 4;
-    private final int VERTEXT_STRIDE = COORDS_PER_VERTEX * BYTES_PER_FLOAT; // 4 bytes per vertex
+    private static final int COORDS_PER_VERTEX = 2;
+    private static final int SIZE_FLOAT = 4;
+    private static final int VERTEXT_STRIDE = COORDS_PER_VERTEX * SIZE_FLOAT; // 4 bytes per vertex
+    private static final int CACHE_SIZE = 2;
 
     //handle
     private final int mProgram;
@@ -67,8 +68,8 @@ public class PointDrawer implements IDrawer{
     /**
      * Sets up the drawing object data for use in an OpenGL ES context.
      */
-    public PointDrawer(int cacheSize) {
-        mVertexCoords = new ArrayObject(null,cacheSize);
+    public PointDrawer() {
+        mVertexCoords = new ArrayObject(null,CACHE_SIZE);
         // prepare shaders and OpenGL program
         int vertexShader = GlUtil.loadShader(
                 GLES20.GL_VERTEX_SHADER, vertexShaderCode);
@@ -81,9 +82,6 @@ public class PointDrawer implements IDrawer{
         GLES20.glLinkProgram(mProgram);                  // create OpenGL program executables
     }
 
-    public PointDrawer() {
-        this(2);
-    }
 
     /**
      * 更新顶点坐标

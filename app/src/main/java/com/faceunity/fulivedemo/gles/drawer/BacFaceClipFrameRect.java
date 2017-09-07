@@ -6,7 +6,6 @@ package com.faceunity.fulivedemo.gles.drawer;
 
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
-import android.opengl.GLU;
 import android.opengl.Matrix;
 
 import com.faceunity.fulivedemo.gles.utils.GlUtil;
@@ -18,7 +17,7 @@ import java.nio.ShortBuffer;
  * This class essentially represents a viewport-sized sprite that will be rendered with
  * a texture, usually from an external source like the camera or video decoder.
  */
-public class FaceClipFrameRect {
+public class BacFaceClipFrameRect {
 
     // Simple vertex shader, used for all programs.
     private static final String VERTEX_SHADER =
@@ -96,7 +95,7 @@ public class FaceClipFrameRect {
     /**
      * Prepares the object.
      */
-    public FaceClipFrameRect() {
+    public BacFaceClipFrameRect() {
         // prepare shaders and OpenGL program
         int vertexShader = GlUtil.loadShader(
                 GLES20.GL_VERTEX_SHADER, VERTEX_SHADER);
@@ -240,6 +239,7 @@ public class FaceClipFrameRect {
     }
 
     /**
+     * 更新脸部显示顶点和抠图纹理
      * @param data 抠图的顶点坐标
      */
     public void refreshClipTextures2(float[] data){
