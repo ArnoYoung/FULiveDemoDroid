@@ -21,10 +21,13 @@ import java.nio.FloatBuffer;
 import java.util.Arrays;
 
 import android.opengl.GLES20;
+import android.opengl.Matrix;
 import android.util.Log;
 
+import com.faceunity.fulivedemo.gles.utils.ArrayObject;
 import com.faceunity.fulivedemo.gles.utils.GlUtil;
 import com.faceunity.fulivedemo.gles.utils.PointDrawer;
+import com.faceunity.wrapper.faceunity;
 
 /**
  *
@@ -87,13 +90,37 @@ public class FaceMarksPointsDrawer extends PointDrawer{
      */
     public float[] getFaceOutline() {
         float[] pointsCoords = getVertextCoods().datas();
-        float[] faces = new float[15 * 2];
-        for (int i = 0;i<faces.length;i++){
+        float[] faces = new float[22 * 2];
+        for (int i = 0;i<faces.length - 6;i++){
             faces[i] = pointsCoords[i];
         }
-        faces[28] = pointsCoords[64 * 2 - 2];
-        faces[29] = pointsCoords[64 * 2 - 1];
+        float dx = pointsCoords[148] - pointsCoords[146];
+        dx = dx/4;
+        faces[31] = faces[31] + 2 * dx / 3;
+        faces[33] = faces[33] + 3 * dx / 4;
+        faces[35] = faces[35] + dx;
+
+        faces[36] = pointsCoords[46];
+        faces[37] = pointsCoords[47] + dx ;
+        faces[38] = pointsCoords[44];
+        faces[39] = pointsCoords[45] + 3 * dx / 4;
+        faces[40] = pointsCoords[42];
+        faces[41] = pointsCoords[43] + 2 * dx / 3;
+
+//        faces[40] = faces[38];
+//        faces[41] = faces[39];
+
+
+        faces[faces.length - 2] = pointsCoords[39 * 2];
+        faces[faces.length - 1 ] = pointsCoords[39 * 2 + 1];
         return faces;
+    }
+
+    ArrayObject mFaceRotation = new ArrayObject(null,2);
+    private float[] getFaceRotation(){
+        mFaceRotation.updateCache(4);
+        faceunity.fuGetFaceInfo(0, "face_rect", mFaceRotation.cache());
+        return mFaceRotation.cache();
     }
 
     int i;
@@ -116,6 +143,15 @@ public class FaceMarksPointsDrawer extends PointDrawer{
                 builder.append(f + " ;");
             }
             Log.d("@facerect",builder.toString());
+
+            StringBuilder strRotation = new StringBuilder();
+            float[] rotations = getFaceRotation();
+            strRotation.append("\n");
+            for (float f:rotations){
+                strRotation.append(f + " ;");
+            }
+            Log.d("@facerotation",strRotation.toString());
+
         }
     }
 }

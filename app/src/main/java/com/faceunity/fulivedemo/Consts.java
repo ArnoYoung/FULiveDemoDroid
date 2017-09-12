@@ -9,5 +9,5 @@ import android.os.Trace;
 
 public class Consts {
     static Context appContext;
-    static boolean VERBOSE_LOG = true;
+    static boolean VERBOSE_LOG = false;
 }

@@ -1,6 +1,7 @@
 package com.faceunity.fulivedemo.gles.utils;
 
 import android.opengl.GLES20;
+import android.opengl.Matrix;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -80,6 +81,7 @@ public class PointDrawer implements IDrawer{
         GLES20.glAttachShader(mProgram, vertexShader);   // add the vertex shader to program
         GLES20.glAttachShader(mProgram, fragmentShader); // add the fragment shader to program
         GLES20.glLinkProgram(mProgram);                  // create OpenGL program executables
+        Matrix.setIdentityM(originMtx,0);
     }
 
 

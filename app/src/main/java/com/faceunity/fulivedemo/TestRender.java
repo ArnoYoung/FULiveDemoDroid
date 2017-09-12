@@ -19,6 +19,7 @@ import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.opengl.Matrix;
 import android.util.Log;
 
 import com.faceunity.fulivedemo.gles.drawer.CameraClipFrameRect;
@@ -27,6 +28,7 @@ import com.faceunity.fulivedemo.gles.drawer.FaceRectPointsDrawer;
 import com.faceunity.fulivedemo.gles.drawer.FullFrameRect;
 import com.faceunity.fulivedemo.gles.drawer.FaceMarksPointsDrawer;
 import com.faceunity.fulivedemo.gles.Texture2dProgram;
+import com.faceunity.fulivedemo.gles.utils.PointDrawer;
 import com.faceunity.wrapper.faceunity;
 
 import java.io.IOException;
@@ -93,6 +95,7 @@ public class TestRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFram
     private FaceMarksPointsDrawer landmarksPoints;
     //在整体窗口绘制脸部标记点
     private FaceRectPointsDrawer faceRectPoints;
+    private PointDrawer mPointDrawer ;
 
     //特质标记点
     private float[] landmarksData = new float[75 * 2];
@@ -102,6 +105,7 @@ public class TestRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFram
     long frameAvailableTimeStamp;
     long resumeTimeStamp;
     boolean isFirstOnFrameAvailable;
+
 
 //    static int mFaceBeautyItem = 0; //美颜道具
 //    static int mEffectItem = 0; //贴纸道具
@@ -175,7 +179,7 @@ public class TestRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFram
 
         landmarksPoints = new FaceMarksPointsDrawer();//如果有证书权限可以获取到的话，绘制人脸特征点
         faceRectPoints = new FaceRectPointsDrawer();//如果有证书权限可以获取到的话，绘制人脸特征点
-
+        mPointDrawer = new PointDrawer();
 
         switchCameraSurfaceTexture();
 
@@ -229,6 +233,9 @@ public class TestRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFram
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         Log.e(TAG, "onSurfaceChanged " + width + " " + height);
         GLES20.glViewport(0, 0, width, height);
+
+        float ratio = (float)  width/height;
+        mFaceClipDrawer.setProjectionMatrix(ratio);
     }
 
 
@@ -249,7 +256,6 @@ public class TestRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFram
 
 
     long oneHundredFrameFUTime;
-
     @Override
     public void onDrawFrame(GL10 gl) {
 
@@ -386,17 +392,12 @@ public class TestRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFram
             faceunity.fuGetFaceInfo(0, "landmarks", landmarksData);
             faceunity.fuGetFaceInfo(0, "face_rect", faceRectData);
             faceRectPoints.refreshFulll(faceRectData, cameraWidth, cameraHeight,cameraFacingDirection != Camera.CameraInfo.CAMERA_FACING_FRONT);
+
             faceRectPoints.draw();
             landmarksPoints.refreshFulll(landmarksData, cameraWidth, cameraHeight, cameraFacingDirection != Camera.CameraInfo.CAMERA_FACING_FRONT);
             landmarksPoints.draw();
-
-//            float[] adds = new float[clipTextures.length + 2];
-//            for (int i = 0;i < clipTextures.length;i++){
-//                adds[i] = clipTextures[i];
-//            }
-//            adds[adds.length - 2] = makrs[64*2 - 2];
-//            adds[adds.length - 1] = makrs[64*2 - 1];
-
+            mPointDrawer.updateVertex(landmarksPoints.getFaceOutline());
+            mPointDrawer.draw();
             mFaceClipDrawer.refreshClipTextures2(landmarksPoints.getFaceOutline());
             mFaceClipDrawer.draw(mtx);
 

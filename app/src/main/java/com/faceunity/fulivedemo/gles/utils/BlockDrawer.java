@@ -56,7 +56,7 @@ public class BlockDrawer implements IDrawer {
     private  FloatBuffer mVertextBuf;
     private  FloatBuffer mTextureBuf;
     private  ShortBuffer mOrderBuf;
-    private float[] mMVPMatrix = new float[16];
+    private ArrayObject mMVPMatrix = new ArrayObject(new float[16],3);
 
     //Handles to the GL program and various components of it.
     private int mProgramHandle;
@@ -77,9 +77,14 @@ public class BlockDrawer implements IDrawer {
 
     }
 
+    public ArrayObject getVertextMartrix(){
+        return mMVPMatrix;
+    }
+
     private void initData() {
         mTextureMatrix = new float[16];
-        Matrix.setIdentityM(mMVPMatrix,0);
+        Matrix.setIdentityM(mMVPMatrix.datas(),0);
+        //Matrix.rotateM(mMVPMatrix,0,80,0,0,0.1f);
         mVertexCoords = new ArrayObject(new float[]{
                 -1.0f, -1.0f,   // 0 bottom left
                 1.0f, -1.0f,   // 1 bottom right
@@ -220,7 +225,7 @@ public class BlockDrawer implements IDrawer {
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, mTextureId);
 
         // Copy the model / view / projection matrix over.
-        GLES20.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mMVPMatrix, 0);
+        GLES20.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mMVPMatrix.datas(), 0);
         GlUtil.checkGlError("glUniformMatrix4fv");
 
         // Copy the texture transformation matrix over.
