@@ -19,7 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.faceunity.fulivedemo.MainActivity"
+            android:name="com.faceunity.fulivedemo.view.MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,16 +28,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.faceunity.fulivedemo.FUDualInputToTextureExampleActivity"
+            android:name="com.faceunity.fulivedemo.view.FUDualInputToTextureExampleActivity"
             android:screenOrientation="portrait"
             android:theme="@style/FullScreenTheme" />
         <activity
-            android:name="com.faceunity.fulivedemo.FURenderToNV21ImageExampleActivity"
+            android:name="com.faceunity.fulivedemo.view.FURenderToNV21ImageExampleActivity"
             android:screenOrientation="portrait"
             android:theme="@style/FullScreenTheme" />
 
         <activity
-            android:name="com.faceunity.fulivedemo.TestActivity"
+            android:name="com.faceunity.fulivedemo.view.TestActivity"
             android:screenOrientation="portrait"
             android:theme="@style/FullScreenTheme" />
     </application>
