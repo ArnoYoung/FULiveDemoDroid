@@ -342,7 +342,7 @@ public class FURenderToNV21ImageExampleActivity extends FUBaseUIActivity
                 //forbid click until start or stop success
                 mTextureMovieEncoder.setOnEncoderStatusUpdateListener(new TextureMovieEncoder.OnEncoderStatusUpdateListener() {
                     @Override
-                    public void onStartSuccess() {
+                    public void onRecordStart() {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -353,7 +353,7 @@ public class FURenderToNV21ImageExampleActivity extends FUBaseUIActivity
                     }
 
                     @Override
-                    public void onStopSuccess() {
+                    public void onRecordStop() {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {

@@ -31,6 +31,7 @@ public class FuManager {
         mCreateItemHandler = new CreateItemHandler(ht.getLooper(), context);
         mEffectFileName = EffectAndFilterSelectAdapter.EFFECT_ITEM_FILE_NAME[1];
         mFuModule = new FuModule();
+        mFuModule.mFilterName = "nature";
     }
 
     public FuModule getModule() {
@@ -91,8 +92,9 @@ public class FuManager {
                             mFuModule.mEffectItem = faceunity.fuCreateItemFromPackage(itemData);
                             faceunity.fuItemSetParam(mFuModule.mEffectItem, "isAndroid", 1.0);
                             faceunity.fuItemSetParam(mFuModule.mEffectItem, "rotationAngle",
-                                    ((TestActivity) mContext.get()).getCameraFacingDriection()
-                                            == Camera.CameraInfo.CAMERA_FACING_FRONT ? 90 : 270);
+                                    //((TestActivity) mContext.get()).getCameraFacingDriection() == Camera.CameraInfo.CAMERA_FACING_FRONT ? 90 : 270);
+                                    true ? 90 : 270);
+
                             if (tmp != 0) {
                                 faceunity.fuDestroyItem(tmp);
                             }

@@ -24,13 +24,12 @@ public class FuMovieEncoder {
     TextureMovieEncoder mTextureMovieEncoder;
     private FullFrameRect mFullScreenFUDisplay;
     private SurfaceTexture mCameraSurfaceTexture;
-    private int mCameraHeight = 1280;
-    private int mCameraWidht = 720;
+    private int mCameraHeight = 720;
+    private int mCameraWidht = 1280;
 
     public FuMovieEncoder(FullFrameRect fullFrameRect,SurfaceTexture surfaceTexture) {
         init(fullFrameRect, surfaceTexture);
     }
-
 
     public FuMovieEncoder(){
 
@@ -41,9 +40,13 @@ public class FuMovieEncoder {
         mCameraSurfaceTexture = surfaceTexture;
     }
 
+    public void updateSurfaceTexture(SurfaceTexture surfaceTexture){
+        mCameraSurfaceTexture = surfaceTexture;
+    }
 
     public void setRecordSize(int cameraHeight, int cameraWidth){
-
+        mCameraWidht = cameraWidth;
+        mCameraHeight = cameraHeight;
     }
 
     public void startRecording() {

@@ -401,7 +401,7 @@ public class TextureMovieEncoder {
                 config.mOutputFile);
         mRequestStop = false;
         if (onEncoderStatusUpdateListener != null) {
-            onEncoderStatusUpdateListener.onStartSuccess();
+            onEncoderStatusUpdateListener.onRecordStart();
         }
     }
 
@@ -459,7 +459,7 @@ public class TextureMovieEncoder {
         }
         stopEncoderSuccess = false;
         if (onEncoderStatusUpdateListener != null) {
-            onEncoderStatusUpdateListener.onStopSuccess();
+            onEncoderStatusUpdateListener.onRecordStop();
         }
     }
 
@@ -699,8 +699,8 @@ public class TextureMovieEncoder {
     }
 
     public interface OnEncoderStatusUpdateListener {
-        void onStartSuccess();
-        void onStopSuccess();
+        void onRecordStart();
+        void onRecordStop();
     }
 
     public void setOnEncoderStatusUpdateListener(OnEncoderStatusUpdateListener _On_encoderStatusUpdateListener) {

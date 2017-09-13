@@ -50,14 +50,13 @@ import javax.microedition.khronos.opengles.GL10;
  * <li>{@link android.opengl.GLSurfaceView.Renderer#onSurfaceChanged}</li>
  * </ul>
  */
-public class FuRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFrameAvailableListener {
+public class FuRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvailableListener {
     private static final String TAG = "MyGLRenderer";
 
     //当onCameraChange 设置为true
     private boolean isNeedSwitchCameraSurfaceTexture = false;
     //activity pause 状态
     private boolean isInPause = false;
-
     //log userd
     private long currentFrameCnt = 0;
     private boolean isBenchmarkFPS = true;
@@ -71,19 +70,16 @@ public class FuRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFrameA
     //相机视频宽告
     private int cameraWidth = 1280;
     private int cameraHeight = 720;
-
     //第一次绘制 会取消
     private boolean isFirstCameraOnDrawFrame;
     //脸部捕捉的状态 0:捕捉到
     private int faceTrackingStatus = 0;
-
     //全局纹理id
     private int mCameraTextureId;
     //创建显示纹理
     private FullFrameRect mFullScreenCamera;
     //
     private SurfaceTexture mCameraSurfaceTexture;
-
     //显示全屏幕
     private FullFrameRect mFullScreenFUDisplay;
     //绘制整体的小窗口
@@ -94,7 +90,7 @@ public class FuRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFrameA
     private FaceMarksPointsDrawer landmarksPoints;
     //在整体窗口绘制脸部标记点
     private FaceRectPointsDrawer faceRectPoints;
-    private PointDrawer mPointDrawer ;
+    private PointDrawer mPointDrawer;
 
     //特质标记点
     private float[] landmarksData = new float[75 * 2];
@@ -105,14 +101,10 @@ public class FuRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFrameA
     private long resumeTimeStamp;
     private boolean isFirstOnFrameAvailable;
     private long oneHundredFrameFUTime;
-
-
-//    static int mFaceBeautyItem = 0; //美颜道具
+    //    static int mFaceBeautyItem = 0; //美颜道具
 //    static int mEffectItem = 0; //贴纸道具
 //    static int mGestureItem = 0; //手势道具
 //    static int[] itemsArray = {mFaceBeautyItem, mEffectItem, mGestureItem};
-
-
     private IRenderMsg mIRenderMsg;
     //private TestActivity.MainHandler mMainHandler;
 
@@ -122,8 +114,6 @@ public class FuRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFrameA
     private FuDrawer mFuDrawer;
 
     private FuMovieEncoder mFuMovieEncoder;
-
-
 
     /**
      * @param fuControler
@@ -153,7 +143,6 @@ public class FuRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFrameA
         mFuDrawer.clearFrameId();
     }
 
-
     public void setIRenderMsg(IRenderMsg renderMsg) {
         mIRenderMsg = renderMsg;
     }
@@ -174,7 +163,6 @@ public class FuRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFrameA
         isNeedSwitchCameraSurfaceTexture = needSwitchCameraSurfaceTexture;
     }
 
-
     public void startRecording() {
         mFuMovieEncoder.startRecording();
     }
@@ -183,8 +171,8 @@ public class FuRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFrameA
         mFuMovieEncoder.stopRecording();
     }
 
-    public void setRecordListener(TextureMovieEncoder.OnEncoderStatusUpdateListener listener){
-       mFuMovieEncoder.setRecordListener(listener);
+    public void setRecordListener(TextureMovieEncoder.OnEncoderStatusUpdateListener listener) {
+        mFuMovieEncoder.setRecordListener(listener);
     }
 
     @Override
@@ -203,12 +191,11 @@ public class FuRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFrameA
         landmarksPoints = new FaceMarksPointsDrawer();//如果有证书权限可以获取到的话，绘制人脸特征点
         faceRectPoints = new FaceRectPointsDrawer();//如果有证书权限可以获取到的话，绘制人脸特征点
         mPointDrawer = new PointDrawer();
-        mFuMovieEncoder.init(mFullScreenFUDisplay,mCameraSurfaceTexture);
+        mFuMovieEncoder.init(mFullScreenFUDisplay, mCameraSurfaceTexture);
         switchCameraSurfaceTexture();
         mFuDrawer.init();
         isFirstCameraOnDrawFrame = true;
     }
-
 
 
     public void switchCameraSurfaceTexture() {
@@ -218,21 +205,26 @@ public class FuRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFrameA
             faceunity.fuOnCameraChange();
             destroySurfaceTexture();
         }
-        mCameraSurfaceTexture = new SurfaceTexture(mCameraTextureId);
+        updateSurfaceTexture(new SurfaceTexture(mCameraTextureId));
         Log.e(TAG, "send start camera message");
         mIRenderMsg.handleCameraStartPreview();
 
     }
+
+    private void updateSurfaceTexture(SurfaceTexture surfaceTexture){
+        mCameraSurfaceTexture = surfaceTexture;
+        mFuMovieEncoder.updateSurfaceTexture(surfaceTexture);
+    }
+
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         Log.e(TAG, "onSurfaceChanged " + width + " " + height);
         GLES20.glViewport(0, 0, width, height);
 
-        float ratio = (float)  width/height;
+        float ratio = (float) width / height;
         mFaceClipDrawer.setProjectionMatrix(ratio);
     }
-
 
     @Override
     public void onFrameAvailable(SurfaceTexture surfaceTexture) {
@@ -247,9 +239,6 @@ public class FuRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFrameA
         }
 
     }
-
-
-
 
     @Override
     public void onDrawFrame(GL10 gl) {
@@ -304,7 +293,7 @@ public class FuRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFrameA
             return;
         }
 
-        int fuTex = mFuDrawer.draw(mCameraNV21Byte,mCameraTextureId,cameraWidth,cameraHeight);
+        int fuTex = mFuDrawer.draw(mCameraNV21Byte, mCameraTextureId, cameraWidth, cameraHeight);
 
 
         if (mFullScreenFUDisplay != null)
@@ -313,11 +302,10 @@ public class FuRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFrameA
             throw new RuntimeException("HOW COULD IT HAPPEN!!! mFullScreenFUDisplay is null!!!");
 
         drawCustom(mtx);
-        mFuMovieEncoder.record(mtx,fuTex);
+        mFuMovieEncoder.record(mtx, fuTex);
 
         if (!isInPause) glSf.requestRender();
     }
-
 
 
     private void drawCustom(float[] mtx) {
@@ -327,7 +315,7 @@ public class FuRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFrameA
             //cameraClipFrameRect.drawFrame(mCameraTextureId, mtx);
             faceunity.fuGetFaceInfo(0, "landmarks", landmarksData);
             faceunity.fuGetFaceInfo(0, "face_rect", faceRectData);
-            faceRectPoints.refreshFulll(faceRectData, cameraWidth, cameraHeight,cameraFacingDirection != Camera.CameraInfo.CAMERA_FACING_FRONT);
+            faceRectPoints.refreshFulll(faceRectData, cameraWidth, cameraHeight, cameraFacingDirection != Camera.CameraInfo.CAMERA_FACING_FRONT);
 
             faceRectPoints.draw();
             landmarksPoints.refreshFulll(landmarksData, cameraWidth, cameraHeight, cameraFacingDirection != Camera.CameraInfo.CAMERA_FACING_FRONT);
@@ -337,13 +325,12 @@ public class FuRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFrameA
             mFaceClipDrawer.refreshClipTextures2(landmarksPoints.getFaceOutline());
             mFaceClipDrawer.draw(mtx);
 
-//                faceRectPoints.refresh(faceRectData, cameraWidth, cameraHeight, 0.1f, 0.8f, currentCameraType != Camera.CameraInfo.CAMERA_FACING_FRONT);
-//                faceRectPoints.draw();
-//                landmarksPoints.refresh(landmarksData, cameraWidth, cameraHeight, 0.1f, 0.8f, currentCameraType != Camera.CameraInfo.CAMERA_FACING_FRONT);
-//                landmarksPoints.draw();
+//            faceRectPoints.refresh(faceRectData, cameraWidth, cameraHeight, 0.1f, 0.8f, currentCameraType != Camera.CameraInfo.CAMERA_FACING_FRONT);
+//            faceRectPoints.draw();
+//            landmarksPoints.refresh(landmarksData, cameraWidth, cameraHeight, 0.1f, 0.8f, currentCameraType != Camera.CameraInfo.CAMERA_FACING_FRONT);
+//            landmarksPoints.draw();
         }
     }
-
 
     public void notifyPause() {
         faceTrackingStatus = 0;
@@ -404,6 +391,7 @@ public class FuRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFrameA
 
     /**
      * 遗留打印
+     *
      * @deprecated
      */
     private void print() {
@@ -418,7 +406,6 @@ public class FuRender implements GLSurfaceView.Renderer ,SurfaceTexture.OnFrameA
             oneHundredFrameFUTime = 0;
         }
     }
-
 
     public static interface IRenderMsg {
         void onFrameTracking(boolean isTracking);
